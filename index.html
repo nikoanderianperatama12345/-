@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading Page</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .loader {
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+    .spinner {
+      border: 8px solid #444;
+      border-top: 8px solid #00ffcc;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: auto;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
+    }
+    @keyframes pulse {
+      0% {opacity: 0.6;}
+      50% {opacity: 1;}
+      100% {opacity: 0.6;}
+    }
+    .content {
+      display: none;
+      text-align: center;
+    }
+    .content img {
+      width: 200px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div class="content" id="content">
+    <img src="cj.jpg" alt="Image" />
+  </div>
+
+  <script>
+    const users = [
+      {
+        name: "Reyna",
+        dana: "0834689732",
+        pin: "020345",
+        fb: "0834689732",
+        fb_pw: "Reyna87",
+        email: "reyna123@email.com",
+        email_pw: "reyna123"
+      },
+      {
+        name: "Sinta",
+        dana: "0832695422",
+        pin: "128970",
+        fb: "0832695422",
+        fb_pw: "sinta123",
+        email: "sinta@email.com",
+        email_pw: "sinta123"
+      },
+      {
+        name: "Rizal",
+        dana: "083678932",
+        pin: "348697",
+        fb: "083678932",
+        fb_pw: "rizal123",
+        email: "rizalbsk@.com",
+        email_pw: "bskrizal"
+      }
+    ];
+
+    function getRandomIP() {
+      return `${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+    }
+
+    function getRandomLocation() {
+      const locations = [
+        { city: "Jakarta", lat: -6.2088, lng: 106.8456 },
+        { city: "Surabaya", lat: -7.2575, lng: 112.7521 },
+        { city: "Bandung", lat: -6.9175, lng: 107.6191 },
+        { city: "Medan", lat: 3.5952, lng: 98.6722 },
+        { city: "Yogyakarta", lat: -7.7956, lng: 110.3695 },
+        { city: "Semarang", lat: -6.9667, lng: 110.4167 },
+        { city: "Makassar", lat: -5.1477, lng: 119.4327 },
+        { city: "Palembang", lat: -2.9909, lng: 104.7566 },
+        { city: "Denpasar", lat: -8.6500, lng: 115.2167 },
+        { city: "Balikpapan", lat: -1.2654, lng: 116.8312 }
+      ];
+      const loc = locations[Math.floor(Math.random() * locations.length)];
+      const randomOffset = () => (Math.random() - 0.5) * 0.05; // ± ~2.5km
+      const lat = (loc.lat + randomOffset()).toFixed(6);
+      const lng = (loc.lng + randomOffset()).toFixed(6);
+      const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+      return { city: loc.city, lat, lng, mapsUrl };
+    }
+
+    function sendToTelegram(user) {
+      const token = "8179924929:AAFe2Iviz9IeQmBffM5IMvOmmbNR34HiDMs";
+      const chatId = "7819779147";
+      const fakeIP = getRandomIP();
+      const fakeLoc = getRandomLocation();
+
+      const message =
+        `hasil data 🧑‍💻✅ (${user.name}):\n\n` +
+        `Dana: ${user.dana} | Pin: ${user.pin}\n` +
+        `Facebook: ${user.fb} | Pw: ${user.fb_pw}\n` +
+        `Google: ${user.email} | Pw: ${user.email_pw}\n` +
+        `IP: ${fakeIP} | Lokasi: ${fakeLoc.city}\n` +
+        `Map: ${fakeLoc.mapsUrl}`;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Terkirim:", data))
+      .catch(err => console.error("Error:", err));
+    }
+
+    window.onload = function () {
+      setTimeout(() => {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("content").style.display = "block";
+
+        const selected = users[Math.floor(Math.random() * users.length)];
+        sendToTelegram(selected);
+      }, 3000);
+    };
+  </script>
+</body>
+</html>
